@@ -38,6 +38,7 @@ test ->
 
 test ->
     console.log storage.getItem('test/!#/world')
+    console.log storage.getItem('test/!#/NOT EXISTS')
     console.log storage.getItem('hello')
 
 test ->

@@ -1,32 +1,34 @@
 mkdirp = require 'mkdirp'
-rimraf = require 'ramrif'
+rimraf = require 'rimraf'
 path = require 'path'
 fs = require 'fs'
 
-escape = (str) ->
+encode = (str) ->
     # in adhering to RFC 3986
     encodeURIComponent(str).replace(/[!'()]/g, escape).replace(/\*/g, "%2A")
 
 class Storage
 
     constructor: (@dirname) ->
-        mkdirp.sync @dirname
 
     getItem: (key) ->
-        file = path.join @dirname, escape(key)
+        file = path.join @dirname, encode(key)
         if fs.existsSync file
-            fs.readFileSync file
+            fs.readFileSync file, {encoding: 'UTF-8'}
         else
             null
 
     setItem: (key, value) ->
-        file = path.join @dirname, escape(key)
+        mkdirp.sync @dirname
+        file = path.join @dirname, encode(key)
         fs.writeFileSync file, value
 
     removeItem: (key) ->
-        file = path.join @dirname, escape(key)
-        fs.unlinkSync file
+        file = path.join @dirname, encode(key)
+        if fs.existsSync file
+            fs.unlinkSync file
 
-    clear: -> ramrif.sync @dirname
+    clear: ->
+        rimraf.sync @dirname
 
 module.exports = Storage
